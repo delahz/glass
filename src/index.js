@@ -230,7 +230,7 @@ app.whenReady().then(async () => {
         );
     }
 
-    // initAutoUpdater should be called after auth is initialized
+    // initAutoUpdater should be called after auth is initializced
     initAutoUpdater();
 
     // Process any pending deep link after everything is initialized
