@@ -17,7 +17,7 @@ export class WelcomeHeader extends LitElement {
             box-sizing: border-box;
             height: auto;
             padding: 24px 16px;
-            background: rgba(0, 0, 0, 0.64);
+            background: rgba(60, 25, 0, 0.64);
             box-shadow: 0px 0px 0px 1.5px rgba(255, 255, 255, 0.64) inset;
             border-radius: 16px;
             flex-direction: column;
@@ -188,7 +188,7 @@ export class WelcomeHeader extends LitElement {
             <div class="container">
                 <button class="close-button" @click=${this.handleClose}>×</button>
                 <div class="header-section">
-                    <div class="title">Welcome to Glass</div>
+                    <div class="title">Welcome to NexOne</div>
                     <div class="subtitle">Choose how to connect your AI model</div>
                 </div>
                 <div class="option-card">
@@ -218,7 +218,7 @@ export class WelcomeHeader extends LitElement {
                     </button>
                 </div>
                 <div class="footer">
-                    Glass does not collect your personal data —
+                    NexOne does not collect your personal data —
                     <span class="footer-link" @click=${this.openPrivacyPolicy}>See details</span>
                 </div>
             </div>

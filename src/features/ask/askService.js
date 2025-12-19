@@ -192,13 +192,34 @@ class AskService {
             this._broadcastState();
     
             internalBridge.emit('window:requestVisibility', { name: 'ask', visible: false });
-    
+
             return { success: true };
         }
-    
 
     /**
-     * 
+     * Show task form in AskView
+     * @param {Object} taskData - Task action data with type, label, and extractedFields
+     * @returns {Object} - Success result
+     */
+    async showTaskForm(taskData) {
+        console.log('📋 AskService: Showing task form:', taskData);
+
+        // Show ask window
+        internalBridge.emit('window:requestVisibility', { name: 'ask', visible: true });
+
+        // Send task data to AskView
+        const { windowPool } = require('../../window/windowManager');
+        const askWindow = windowPool?.get('ask');
+
+        if (askWindow && !askWindow.isDestroyed()) {
+            askWindow.webContents.send('ask:showTaskForm', taskData);
+        }
+
+        return { success: true };
+    }
+
+    /**
+     *
      * @param {string[]} conversationTexts
      * @returns {string}
      * @private

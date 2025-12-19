@@ -150,18 +150,18 @@ export default function SettingsPage() {
 
   const renderBillingContent = () => (
     <div className="space-y-8">
-      <div className={`p-4 rounded-lg border ${isFirebaseMode ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'}`}>
+      <div className={`p-4 rounded-lg border ${isFirebaseMode ? 'bg-orange-50 border-orange-200' : 'bg-gray-50 border-gray-200'}`}>
         <div className="flex items-center gap-2 mb-2">
           {isFirebaseMode ? (
-            <Cloud className="h-5 w-5 text-blue-600" />
+            <Cloud className="h-5 w-5 text-orange-600" />
           ) : (
             <HardDrive className="h-5 w-5 text-gray-600" />
           )}
-          <h3 className={`font-semibold ${isFirebaseMode ? 'text-blue-900' : 'text-gray-900'}`}>
+          <h3 className={`font-semibold ${isFirebaseMode ? 'text-orange-900' : 'text-gray-900'}`}>
             {isFirebaseMode ? 'Firebase Hosting Mode' : 'Local Execution Mode'}
           </h3>
         </div>
-        <p className={`text-sm ${isFirebaseMode ? 'text-blue-700' : 'text-gray-700'}`}>
+        <p className={`text-sm ${isFirebaseMode ? 'text-orange-700' : 'text-gray-700'}`}>
           {isFirebaseMode 
             ? 'All data is safely stored and synchronized in Firebase Cloud.'
             : 'Data is stored in local database and you can use personal API keys.'
@@ -202,7 +202,7 @@ export default function SettingsPage() {
           </div>
           
           <p className="text-gray-600 mb-6">
-            Experience how Pickle Glass works with unlimited responses.
+            Experience how NexOne works with unlimited responses.
           </p>
           
           <ul className="space-y-3 mb-8">
@@ -272,7 +272,7 @@ export default function SettingsPage() {
             </li>
           </ul>
           
-          <button className="w-full py-2 px-4 bg-cyan-400 text-white rounded-md font-medium">
+          <button className="w-full py-2 px-4 bg-orange-500 text-white rounded-md font-medium">
             Coming Soon
           </button>
         </div>
@@ -330,9 +330,9 @@ export default function SettingsPage() {
           <div>
             <h4 className="font-semibold text-green-900">All features are currently free!</h4>
             <p className="text-green-700 text-sm">
-              {isFirebaseMode 
-                ? 'Enjoy all Pickle Glass features for free in Firebase hosting mode. Pro and Enterprise plans will be released soon with additional premium features.'
-                : 'Enjoy all Pickle Glass features for free in local mode. You can use personal API keys or continue using the free system.'
+              {isFirebaseMode
+                ? 'Enjoy all NexOne features for free in Firebase hosting mode. Pro and Enterprise plans will be released soon with additional premium features.'
+                : 'Enjoy all NexOne features for free in local mode. You can use personal API keys or continue using the free system.'
               }
             </p>
           </div>
@@ -348,20 +348,20 @@ export default function SettingsPage() {
       case 'profile':
         return (
           <div className="space-y-6">
-            <div className={`p-4 rounded-lg border ${isFirebaseMode ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'}`}>
+            <div className={`p-4 rounded-lg border ${isFirebaseMode ? 'bg-orange-50 border-orange-200' : 'bg-gray-50 border-gray-200'}`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {isFirebaseMode ? (
-                    <Cloud className="h-5 w-5 text-blue-600" />
+                    <Cloud className="h-5 w-5 text-orange-600" />
                   ) : (
                     <HardDrive className="h-5 w-5 text-gray-600" />
                   )}
                   <div>
-                    <h3 className={`font-semibold ${isFirebaseMode ? 'text-blue-900' : 'text-gray-900'}`}>
+                    <h3 className={`font-semibold ${isFirebaseMode ? 'text-orange-900' : 'text-gray-900'}`}>
                       {isFirebaseMode ? 'Firebase Hosting Mode' : 'Local Execution Mode'}
                     </h3>
-                    <p className={`text-sm ${isFirebaseMode ? 'text-blue-700' : 'text-gray-700'}`}>
-                      {isFirebaseMode 
+                    <p className={`text-sm ${isFirebaseMode ? 'text-orange-700' : 'text-gray-700'}`}>
+                      {isFirebaseMode
                         ? `Logged in with Google account (${userInfo.email})`
                         : 'Running as local user'
                       }
@@ -371,7 +371,7 @@ export default function SettingsPage() {
                 {isFirebaseMode && (
                   <button
                     onClick={handleLogout}
-                    className="px-3 py-1 text-sm text-blue-600 hover:text-blue-700 underline"
+                    className="px-3 py-1 text-sm text-orange-600 hover:text-orange-700 underline"
                   >
                     Logout
                   </button>
@@ -388,7 +388,7 @@ export default function SettingsPage() {
                     id="display-name"
                     value={displayNameInput}
                     onChange={(e) => setDisplayNameInput(e.target.value)}
-                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm text-black"
+                    className="block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm text-black"
                     maxLength={32}
                   />
                   <p className="text-xs text-gray-500 mt-2">You can use up to 32 characters.</p>
@@ -450,7 +450,7 @@ export default function SettingsPage() {
                  <p className="text-sm text-gray-600 mb-4">
                    {isFirebaseMode 
                      ? 'Permanently remove your Firebase account and all content. This action cannot be undone, so please proceed carefully.'
-                     : 'Permanently remove your personal account and all content from the Pickle Glass platform. This action cannot be undone, so please proceed carefully.'
+                     : 'Permanently remove your personal account and all content from the NexOne platform. This action cannot be undone, so please proceed carefully.'
                    }
                  </p>
                  <div className="mt-4 pt-4 border-t border-gray-200 flex justify-end">

@@ -21,7 +21,7 @@ export class SettingsView extends LitElement {
             flex-direction: column;
             height: 100%;
             width: 100%;
-            background: rgba(20, 20, 20, 0.8);
+            background: rgba(80, 35, 5, 0.8);
             border-radius: 12px;
             outline: 0.5px rgba(255, 255, 255, 0.2) solid;
             outline-offset: -1px;
@@ -59,7 +59,7 @@ export class SettingsView extends LitElement {
             bottom: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.15);
+            background: rgba(60, 25, 0, 0.15);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             border-radius: 12px;
             filter: blur(10px);
@@ -226,7 +226,7 @@ export class SettingsView extends LitElement {
 
         .api-key-section input {
             width: 100%;
-            background: rgba(0,0,0,0.2);
+            background: rgba(60,25,0,0.2);
             border: 1px solid rgba(255,255,255,0.2);
             color: white;
             border-radius: 4px;
@@ -305,9 +305,9 @@ export class SettingsView extends LitElement {
         }
 
         .preset-item.selected {
-            background: rgba(0, 122, 255, 0.25);
-            border-color: rgba(0, 122, 255, 0.6);
-            box-shadow: 0 0 0 1px rgba(0, 122, 255, 0.3);
+            background: rgba(255, 107, 0, 0.25);
+            border-color: rgba(255, 107, 0, 0.6);
+            box-shadow: 0 0 0 1px rgba(255, 107, 0, 0.3);
         }
 
         .preset-name {
@@ -325,7 +325,7 @@ export class SettingsView extends LitElement {
 
         .preset-status {
             font-size: 9px;
-            color: rgba(0, 122, 255, 0.8);
+            color: rgba(255, 107, 0, 0.8);
             font-weight: 500;
             margin-left: 6px;
         }
@@ -339,13 +339,13 @@ export class SettingsView extends LitElement {
         }
 
         .no-presets-message .web-link {
-            color: rgba(0, 122, 255, 0.8);
+            color: rgba(255, 107, 0, 0.8);
             text-decoration: underline;
             cursor: pointer;
         }
 
         .no-presets-message .web-link:hover {
-            color: rgba(0, 122, 255, 1);
+            color: rgba(255, 107, 0, 1);
         }
 
         .loading-state {
@@ -394,14 +394,14 @@ export class SettingsView extends LitElement {
             font-weight: 600;
         }
         .provider-key-group input {
-            width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.2);
+            width: 100%; background: rgba(25,12,5,0.2); border: 1px solid rgba(255,255,255,0.2);
             color: white; border-radius: 4px; padding: 5px 8px; font-size: 11px; box-sizing: border-box;
         }
         .key-buttons { display: flex; gap: 4px; }
         .key-buttons .settings-button { flex: 1; padding: 4px; }
         .model-list {
             display: flex; flex-direction: column; gap: 2px; max-height: 120px;
-            overflow-y: auto; background: rgba(0,0,0,0.3); border-radius: 4px;
+            overflow-y: auto; background: rgba(60,25,0,0.3); border-radius: 4px;
             padding: 4px; margin-top: 4px;
         }
         .model-item { 
@@ -415,7 +415,7 @@ export class SettingsView extends LitElement {
             align-items: center; 
         }
         .model-item:hover { background-color: rgba(255,255,255,0.1); }
-        .model-item.selected { background-color: rgba(0, 122, 255, 0.4); font-weight: 500; }
+        .model-item.selected { background-color: rgba(255, 107, 0, 0.4); font-weight: 500; }
         .model-status { 
             font-size: 9px; 
             color: rgba(255,255,255,0.6); 
@@ -433,13 +433,13 @@ export class SettingsView extends LitElement {
         }
         .install-progress-bar {
             height: 100%;
-            background: rgba(0, 122, 255, 0.8);
+            background: rgba(255, 107, 0, 0.8);
             transition: width 0.3s ease;
         }
         
         /* Dropdown styles */
         select.model-dropdown {
-            background: rgba(0,0,0,0.2);
+            background: rgba(60,25,0,0.2);
             color: white;
             cursor: pointer;
         }
@@ -1351,7 +1351,7 @@ export class SettingsView extends LitElement {
             <div class="settings-container">
                 <div class="header-section">
                     <div>
-                        <h1 class="app-title">Pickle Glass</h1>
+                        <h1 class="app-title">NexOne</h1>
                         <div class="account-info">
                             ${this.firebaseUser
                                 ? html`Account: ${this.firebaseUser.email || 'Logged In'}`

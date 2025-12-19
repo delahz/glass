@@ -42,7 +42,7 @@ export class ListenView extends LitElement {
 
 /* highlight.js 스타일 추가 */
 .insights-container pre {
-    background: rgba(0, 0, 0, 0.4) !important;
+    background: rgba(60, 25, 0, 0.4) !important;
     border-radius: 8px !important;
     padding: 12px !important;
     margin: 8px 0 !important;
@@ -121,7 +121,7 @@ export class ListenView extends LitElement {
             color: #ffffff;
             box-sizing: border-box;
             position: relative;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(60, 25, 0, 0.6);
             overflow: hidden;
             border-radius: 12px;
             width: 100%;
@@ -153,7 +153,7 @@ export class ListenView extends LitElement {
             bottom: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.15);
+            background: rgba(60, 25, 0, 0.15);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             border-radius: 12px;
             z-index: -1;
@@ -627,10 +627,10 @@ export class ListenView extends LitElement {
         const displayText = this.isHovering
             ? this.viewMode === 'transcript'
                 ? 'Copy Transcript'
-                : 'Copy Glass Analysis'
+                : 'Copy NexOne Analysis'
             : this.viewMode === 'insights'
             ? `Live insights`
-            : `Glass is Listening ${this.elapsedTime}`;
+            : `NexOne is Listening ${this.elapsedTime}`;
 
         return html`
             <div class="assistant-container">

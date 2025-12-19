@@ -11,7 +11,7 @@ export class SummaryView extends LitElement {
 
         /* highlight.js 스타일 추가 */
         .insights-container pre {
-            background: rgba(0, 0, 0, 0.4) !important;
+            background: rgba(60, 25, 0, 0.4) !important;
             border-radius: 8px !important;
             padding: 12px !important;
             margin: 8px 0 !important;
@@ -92,7 +92,7 @@ export class SummaryView extends LitElement {
             width: 8px;
         }
         .insights-container::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.1);
+            background: rgba(60, 25, 0, 0.1);
             border-radius: 4px;
         }
         .insights-container::-webkit-scrollbar-thumb {
@@ -220,6 +220,44 @@ export class SummaryView extends LitElement {
         .markdown-content em {
             font-style: italic;
             color: #f1fa8c;
+        }
+
+        /* Task Action Card Styles */
+        .task-action-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            margin: 8px 0;
+            background: linear-gradient(135deg, rgba(255, 107, 0, 0.25) 0%, rgba(255, 107, 0, 0.15) 100%);
+            border: 1px solid rgba(255, 107, 0, 0.4);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .task-action-card:hover {
+            background: linear-gradient(135deg, rgba(255, 107, 0, 0.35) 0%, rgba(255, 107, 0, 0.25) 100%);
+            border-color: rgba(255, 107, 0, 0.6);
+            transform: translateX(3px);
+        }
+
+        .task-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .task-label {
+            flex: 1;
+            font-size: 12px;
+            font-weight: 500;
+            color: white;
+        }
+
+        .task-arrow {
+            font-size: 14px;
+            color: rgba(255, 107, 0, 0.8);
+            font-weight: 600;
         }
 
         .empty-state {
@@ -406,6 +444,12 @@ export class SummaryView extends LitElement {
     async handleRequestClick(requestText) {
         console.log('🔥 Analysis request clicked:', requestText);
 
+        // Check if this is a task action
+        if (this.structuredData?.taskAction &&
+            requestText.includes(this.structuredData.taskAction.label)) {
+            return this.handleTaskClick();
+        }
+
         if (window.api) {
             try {
                 const result = await window.api.summaryView.sendQuestionFromSummary(requestText);
@@ -419,6 +463,29 @@ export class SummaryView extends LitElement {
                 console.error('❌ Error in handleRequestClick:', error);
             }
         }
+    }
+
+    async handleTaskClick() {
+        console.log('📋 Task action clicked:', this.structuredData?.taskAction);
+
+        if (window.api && this.structuredData?.taskAction) {
+            try {
+                // Open task window with task data
+                await window.api.summaryView.showTaskWindow(this.structuredData.taskAction);
+                console.log('✅ Task window opened');
+            } catch (error) {
+                console.error('❌ Error opening task window:', error);
+            }
+        }
+    }
+
+    getTaskIcon(taskType) {
+        const icons = {
+            vehicle_change: '🚗',
+            mortgage_change: '🏠',
+            policy_update: '📋',
+        };
+        return icons[taskType] || '📋';
     }
 
     getSummaryText() {
@@ -460,7 +527,7 @@ export class SummaryView extends LitElement {
             actions: [],
         };
 
-        const hasAnyContent = data.summary.length > 0 || data.topic.bullets.length > 0 || data.actions.length > 0;
+        const hasAnyContent = data.summary.length > 0 || data.topic.bullets.length > 0 || data.actions.length > 0 || data.taskAction;
 
         return html`
             <div class="insights-container">
@@ -520,6 +587,15 @@ export class SummaryView extends LitElement {
                                               </div>
                                           `
                                       )}
+                              `
+                            : ''}
+                        ${data.taskAction
+                            ? html`
+                                  <insights-title>Suggested Task</insights-title>
+                                  <div class="task-action-card" @click=${() => this.handleTaskClick()}>
+                                      <span class="task-label">${data.taskAction.label}</span>
+                                      <span class="task-arrow">→</span>
+                                  </div>
                               `
                             : ''}
                         ${this.hasCompletedRecording && data.followUps && data.followUps.length > 0

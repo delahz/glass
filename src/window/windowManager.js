@@ -46,9 +46,13 @@ function updateChildWindowLayouts(animated = true) {
 
     const visibleWindows = {};
     const listenWin = windowPool.get('listen');
+    const taskWin = windowPool.get('task');
     const askWin = windowPool.get('ask');
     if (listenWin && !listenWin.isDestroyed() && listenWin.isVisible()) {
         visibleWindows.listen = true;
+    }
+    if (taskWin && !taskWin.isDestroyed() && taskWin.isVisible()) {
+        visibleWindows.task = true;
     }
     if (askWin && !askWin.isDestroyed() && askWin.isVisible()) {
         visibleWindows.ask = true;
@@ -350,22 +354,24 @@ async function handleWindowVisibilityRequest(windowPool, layoutManager, movement
         return;
     }
 
-    if (name === 'listen' || name === 'ask') {
+    if (name === 'listen' || name === 'ask' || name === 'task') {
         const win = windowPool.get(name);
-        const otherName = name === 'listen' ? 'ask' : 'listen';
-        const otherWin = windowPool.get(otherName);
-        const isOtherWinVisible = otherWin && !otherWin.isDestroyed() && otherWin.isVisible();
-        
+        const listenWin = windowPool.get('listen');
+        const taskWin = windowPool.get('task');
+        const askWin = windowPool.get('ask');
+
         const ANIM_OFFSET_X = 50;
         const ANIM_OFFSET_Y = 20;
 
+        // Calculate current visibility for all feature windows
         const finalVisibility = {
-            listen: (name === 'listen' && shouldBeVisible) || (otherName === 'listen' && isOtherWinVisible),
-            ask: (name === 'ask' && shouldBeVisible) || (otherName === 'ask' && isOtherWinVisible),
+            listen: listenWin && !listenWin.isDestroyed() && listenWin.isVisible(),
+            task: taskWin && !taskWin.isDestroyed() && taskWin.isVisible(),
+            ask: askWin && !askWin.isDestroyed() && askWin.isVisible(),
         };
-        if (!shouldBeVisible) {
-            finalVisibility[name] = false;
-        }
+
+        // Update the target window's visibility
+        finalVisibility[name] = shouldBeVisible;
 
         const targetLayout = layoutManager.calculateFeatureWindowLayout(finalVisibility);
 
@@ -376,6 +382,7 @@ async function handleWindowVisibilityRequest(windowPool, layoutManager, movement
 
             const startPos = { ...targetBounds };
             if (name === 'listen') startPos.x -= ANIM_OFFSET_X;
+            else if (name === 'task') startPos.y -= ANIM_OFFSET_Y;
             else if (name === 'ask') startPos.y -= ANIM_OFFSET_Y;
 
             win.setOpacity(0);
@@ -391,12 +398,13 @@ async function handleWindowVisibilityRequest(windowPool, layoutManager, movement
             const currentBounds = win.getBounds();
             const targetPos = { ...currentBounds };
             if (name === 'listen') targetPos.x -= ANIM_OFFSET_X;
+            else if (name === 'task') targetPos.y -= ANIM_OFFSET_Y;
             else if (name === 'ask') targetPos.y -= ANIM_OFFSET_Y;
 
             movementManager.fade(win, { to: 0, onComplete: () => win.hide() });
             movementManager.animateWindowPosition(win, targetPos);
-            
-            // 다른 창들도 새 레이아웃으로 애니메이션
+
+            // Animate other windows to new layout
             const otherWindowsLayout = { ...targetLayout };
             delete otherWindowsLayout[name];
             movementManager.animateLayout(otherWindowsLayout);
@@ -556,6 +564,36 @@ function createFeatureWindows(header, namesToCreate) {
                 break;
             }
 
+            // task window for task preview
+            case 'task': {
+                const task = new BrowserWindow({ ...commonChildOptions, width:350 });
+                task.setContentProtection(isContentProtectionOn);
+                task.setVisibleOnAllWorkspaces(true,{visibleOnFullScreen:true});
+                if (process.platform === 'darwin') {
+                    task.setWindowButtonVisibility(false);
+                }
+                const taskLoadOptions = { query: { view: 'task' } };
+                if (!shouldUseLiquidGlass) {
+                    task.loadFile(path.join(__dirname, '../ui/app/content.html'), taskLoadOptions);
+                }
+                else {
+                    taskLoadOptions.query.glass = 'true';
+                    task.loadFile(path.join(__dirname, '../ui/app/content.html'), taskLoadOptions);
+                    task.webContents.once('did-finish-load', () => {
+                        const viewId = liquidGlass.addView(task.getNativeWindowHandle());
+                        if (viewId !== -1) {
+                            liquidGlass.unstable_setVariant(viewId, liquidGlass.GlassMaterialVariant.bubbles);
+                        }
+                    });
+                }
+
+                if (!app.isPackaged) {
+                    task.webContents.openDevTools({ mode: 'detach' });
+                }
+                windowPool.set('task', task);
+                break;
+            }
+
             case 'shortcut-settings': {
                 const shortcutEditor = new BrowserWindow({
                     ...commonChildOptions,
@@ -609,7 +647,7 @@ function createFeatureWindows(header, namesToCreate) {
 }
 
 function destroyFeatureWindows() {
-    const featureWindows = ['listen','ask','settings','shortcut-settings'];
+    const featureWindows = ['listen','task','ask','settings','shortcut-settings'];
     if (settingsHideTimer) {
         clearTimeout(settingsHideTimer);
         settingsHideTimer = null;
@@ -790,6 +828,22 @@ const handleHeaderStateChanged = (state) => {
 };
 
 
+// Wrapper for external use - uses module-level managers
+const handleWindowVisibilityRequestExternal = async (name, shouldBeVisible) => {
+    if (!layoutManager || !movementManager) {
+        console.warn('[WindowManager] Managers not initialized');
+        return;
+    }
+    // Create task window lazily if needed
+    if (name === 'task' && !windowPool.has('task')) {
+        const header = windowPool.get('header');
+        if (header) {
+            createFeatureWindows(header, ['task']);
+        }
+    }
+    await handleWindowVisibilityRequest(windowPool, layoutManager, movementManager, name, shouldBeVisible);
+};
+
 module.exports = {
     createWindows,
     windowPool,
@@ -806,4 +860,5 @@ module.exports = {
     getHeaderPosition,
     moveHeaderTo,
     adjustWindowHeight,
+    handleWindowVisibilityRequest: handleWindowVisibilityRequestExternal,
 };

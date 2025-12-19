@@ -4,6 +4,7 @@ const { createLLM } = require('../../common/ai/factory');
 const sessionRepository = require('../../common/repositories/session');
 const summaryRepository = require('./repositories');
 const modelStateService = require('../../common/services/modelStateService');
+const { detectTaskFromConversation } = require('./taskTemplates');
 
 class SummaryService {
     constructor() {
@@ -152,6 +153,15 @@ Keep all points concise and build upon previous analysis if provided.`,
             console.log(`✅ Analysis response received: ${responseText}`);
             const structuredData = this.parseResponseText(responseText, this.previousAnalysisResult);
 
+            // LOCAL TASK DETECTION: Check conversation for task-triggering keywords
+            // This is independent of AI output - uses keyword matching on actual conversation
+            const conversationFullText = conversationTexts.join(' ');
+            const detectedTask = detectTaskFromConversation(conversationFullText);
+            if (detectedTask) {
+                console.log('🎯 Local task detection found:', detectedTask.type);
+                structuredData.taskAction = detectedTask;
+            }
+
             if (this.currentSessionId) {
                 try {
                     summaryRepository.saveSummary({
@@ -192,6 +202,7 @@ Keep all points concise and build upon previous analysis if provided.`,
             topic: { header: '', bullets: [] },
             actions: [],
             followUps: ['✉️ Draft a follow-up email', '✅ Generate action items', '📝 Show summary'],
+            taskAction: null, // For context-aware task detection
         };
 
         // 이전 결과가 있으면 기본값으로 사용
@@ -226,6 +237,54 @@ Keep all points concise and build upon previous analysis if provided.`,
                     continue;
                 } else if (trimmedLine.startsWith('**Suggested Questions**')) {
                     currentSection = 'questions';
+                    continue;
+                } else if (trimmedLine.startsWith('**Suggested Task:**')) {
+                    currentSection = 'task';
+                    // Extract task label (e.g., "🚗 Create vehicle change task in NexAgency")
+                    const taskLabel = trimmedLine.replace('**Suggested Task:**', '').trim();
+                    if (taskLabel.includes('vehicle change')) {
+                        structuredData.taskAction = {
+                            type: 'vehicle_change',
+                            label: taskLabel,
+                            extractedFields: {
+                                action_type: '',
+                                make: '',
+                                model: '',
+                                year: '',
+                                vin: '',
+                            },
+                        };
+                    }
+                    continue;
+                }
+
+                // Parse task action fields
+                if (currentSection === 'task' && structuredData.taskAction && trimmedLine.startsWith('-')) {
+                    const fieldLine = trimmedLine.substring(1).trim();
+                    const colonIndex = fieldLine.indexOf(':');
+                    if (colonIndex > 0) {
+                        const fieldName = fieldLine.substring(0, colonIndex).trim().toLowerCase();
+                        let fieldValue = fieldLine.substring(colonIndex + 1).trim();
+
+                        // Clean up "Not mentioned" values
+                        if (fieldValue.toLowerCase() === 'not mentioned' || fieldValue === '') {
+                            fieldValue = '';
+                        }
+
+                        // Map to our field keys
+                        const fieldMap = {
+                            'action': 'action_type',
+                            'make': 'make',
+                            'model': 'model',
+                            'year': 'year',
+                            'vin': 'vin',
+                        };
+
+                        const mappedKey = fieldMap[fieldName];
+                        if (mappedKey && structuredData.taskAction.extractedFields.hasOwnProperty(mappedKey)) {
+                            structuredData.taskAction.extractedFields[mappedKey] = fieldValue;
+                        }
+                    }
                     continue;
                 }
 

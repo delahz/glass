@@ -1,5 +1,6 @@
 import { html, css, LitElement } from '../../ui/assets/lit-core-2.7.4.min.js';
 import { parser, parser_write, parser_end, default_renderer } from '../../ui/assets/smd.js';
+import './TaskFormPreview.js';
 
 export class AskView extends LitElement {
     static properties = {
@@ -14,6 +15,7 @@ export class AskView extends LitElement {
         headerText: { type: String },
         headerAnimating: { type: Boolean },
         isStreaming: { type: Boolean },
+        taskFormData: { type: Object }, // For context-aware task form
     };
 
     static styles = css`
@@ -106,7 +108,7 @@ export class AskView extends LitElement {
         }
 
         .response-container pre {
-            background: rgba(0, 0, 0, 0.4) !important;
+            background: rgba(60, 25, 0, 0.4) !important;
             border-radius: 8px !important;
             padding: 12px !important;
             margin: 8px 0 !important;
@@ -176,7 +178,7 @@ export class AskView extends LitElement {
             flex-direction: column;
             height: 100%;
             width: 100%;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(60, 25, 0, 0.6);
             border-radius: 12px;
             outline: 0.5px rgba(255, 255, 255, 0.3) solid;
             outline-offset: -1px;
@@ -195,7 +197,7 @@ export class AskView extends LitElement {
             bottom: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.15);
+            background: rgba(60, 25, 0, 0.15);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             border-radius: 12px;
             filter: blur(10px);
@@ -490,7 +492,7 @@ export class AskView extends LitElement {
             align-items: center;
             gap: 8px;
             padding: 12px 16px;
-            background: rgba(0, 0, 0, 0.1);
+            background: rgba(60, 25, 0, 0.1);
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             flex-shrink: 0;
             transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
@@ -513,7 +515,7 @@ export class AskView extends LitElement {
         #textInput {
             flex: 1;
             padding: 10px 14px;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(60, 25, 0, 0.2);
             border-radius: 20px;
             outline: none;
             border: none;
@@ -721,6 +723,7 @@ export class AskView extends LitElement {
         this.headerText = 'AI Response';
         this.headerAnimating = false;
         this.isStreaming = false;
+        this.taskFormData = null; // For context-aware task form
 
         this.marked = null;
         this.hljs = null;
@@ -740,6 +743,8 @@ export class AskView extends LitElement {
         this.handleScroll = this.handleScroll.bind(this);
         this.handleCloseAskWindow = this.handleCloseAskWindow.bind(this);
         this.handleCloseIfNoContent = this.handleCloseIfNoContent.bind(this);
+        this.handleTaskFormCancel = this.handleTaskFormCancel.bind(this);
+        this.handleTaskFormConfirm = this.handleTaskFormConfirm.bind(this);
 
         this.loadLibraries();
 
@@ -787,14 +792,19 @@ export class AskView extends LitElement {
             window.api.askView.onScrollResponseUp(() => this.handleScroll('up'));
             window.api.askView.onScrollResponseDown(() => this.handleScroll('down'));
             window.api.askView.onAskStateUpdate((event, newState) => {
+                // Clear task form when new response starts
+                if (newState.isLoading && this.taskFormData) {
+                    this.taskFormData = null;
+                }
+
                 this.currentResponse = newState.currentResponse;
                 this.currentQuestion = newState.currentQuestion;
                 this.isLoading       = newState.isLoading;
                 this.isStreaming     = newState.isStreaming;
-              
+
                 const wasHidden = !this.showTextInput;
                 this.showTextInput = newState.showTextInput;
-              
+
                 if (newState.showTextInput) {
                   if (wasHidden) {
                     this.updateComplete.then(() => this.focusTextInput());
@@ -803,6 +813,18 @@ export class AskView extends LitElement {
                   }
                 }
               });
+
+            // Listen for task form data
+            window.api.askView.onShowTaskForm?.((event, taskData) => {
+                console.log('📋 AskView: Received task form data:', taskData);
+                this.taskFormData = taskData;
+                this.currentResponse = '';
+                this.currentQuestion = taskData?.label || 'Task Preview';
+                this.isLoading = false;
+                this.isStreaming = false;
+                this.showTextInput = false;
+            });
+
             console.log('AskView: IPC 이벤트 리스너 등록 완료');
         }
     }
@@ -901,9 +923,29 @@ export class AskView extends LitElement {
     }
 
     handleCloseIfNoContent() {
-        if (!this.currentResponse && !this.isLoading && !this.isStreaming) {
+        if (!this.currentResponse && !this.isLoading && !this.isStreaming && !this.taskFormData) {
             this.handleCloseAskWindow();
         }
+    }
+
+    handleTaskFormCancel() {
+        console.log('📋 Task form cancelled');
+        this.taskFormData = null;
+        this.showTextInput = true;
+        this.handleCloseAskWindow();
+    }
+
+    handleTaskFormConfirm(e) {
+        const { taskType, formValues } = e.detail;
+        console.log('📋 Task form confirmed:', taskType, formValues);
+
+        // For now, just log the data and close
+        // TODO: Send to NexAgency when integration is ready
+        alert(`Task Created!\n\nType: ${taskType}\nData: ${JSON.stringify(formValues, null, 2)}\n\n(NexAgency integration coming soon)`);
+
+        this.taskFormData = null;
+        this.showTextInput = true;
+        this.handleCloseAskWindow();
     }
 
     handleEscKey(e) {
@@ -991,6 +1033,9 @@ export class AskView extends LitElement {
 
 
     renderContent() {
+        // Skip rendering if showing task form - TaskFormPreview handles its own content
+        if (this.taskFormData) return;
+
         const responseContainer = this.shadowRoot.getElementById('responseContainer');
         if (!responseContainer) return;
     
@@ -1329,11 +1374,14 @@ export class AskView extends LitElement {
 
 
     render() {
-        const hasResponse = this.isLoading || this.currentResponse || this.isStreaming;
-        const headerText = this.isLoading ? 'Thinking...' : 'AI Response';
+        const hasResponse = this.isLoading || this.currentResponse || this.isStreaming || this.taskFormData;
+        const headerText = this.isLoading ? 'Thinking...' : (this.taskFormData ? 'Task Preview' : 'AI Response');
 
         return html`
-            <div class="ask-container">
+            <div class="ask-container"
+                @task-form-cancel=${this.handleTaskFormCancel}
+                @task-form-confirm=${this.handleTaskFormConfirm}
+            >
                 <!-- Response Header -->
                 <div class="response-header ${!hasResponse ? 'hidden' : ''}">
                     <div class="header-left">
@@ -1377,7 +1425,10 @@ export class AskView extends LitElement {
 
                 <!-- Response Container -->
                 <div class="response-container ${!hasResponse ? 'hidden' : ''}" id="responseContainer">
-                    <!-- Content is dynamically generated in updateResponseContent() -->
+                    ${this.taskFormData
+                        ? html`<task-form-preview .taskData=${this.taskFormData}></task-form-preview>`
+                        : html`<!-- Content is dynamically generated in updateResponseContent() -->`
+                    }
                 </div>
 
                 <!-- Text Input Container -->

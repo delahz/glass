@@ -8,11 +8,23 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#3b82f6',
+        primary: '#FF6B00',
         secondary: '#64748b',
-        accent: '#06b6d4',
+        accent: '#FF8C33',
         'subtle-bg': '#f8f7f4',
         'subtle-active-bg': '#e7e5e4',
+        'orange': {
+          50: '#FFF7ED',
+          100: '#FFEDD5',
+          200: '#FED7AA',
+          300: '#FDBA74',
+          400: '#FB923C',
+          500: '#FF6B00',
+          600: '#EA580C',
+          700: '#C2410C',
+          800: '#9A3412',
+          900: '#7C2D12',
+        },
       },
     },
   },

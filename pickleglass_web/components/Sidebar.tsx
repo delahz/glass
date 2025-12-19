@@ -223,16 +223,10 @@ const SidebarComponent = ({ isCollapsed, onToggle, onSearchClick }: SidebarProps
                 ariaLabel: 'Help Center (new window)',
             },
             {
-                href: 'https://www.dropbox.com/scl/fi/esk4h8z45sryvbremy57v/Pickle_latest.dmg?rlkey=92y535bz6p6gov6vd17x6q53b&st=9kl0annj&dl=1',
+                href: 'https://www.dropbox.com/scl/fi/znid09apxiwtwvxer6oc9/Glass_latest.dmg?rlkey=gwvvyb3bizkl25frhs4k1zwds&st=37q31b4w&dl=1',
                 icon: '/download.svg',
-                text: 'Download Pickle Camera',
-                ariaLabel: 'Download Pickle Camera (new window)',
-            },
-            {
-                href: 'hhttps://www.dropbox.com/scl/fi/znid09apxiwtwvxer6oc9/Glass_latest.dmg?rlkey=gwvvyb3bizkl25frhs4k1zwds&st=37q31b4w&dl=1',
-                icon: '/download.svg',
-                text: 'Download Pickle Glass',
-                ariaLabel: 'Download Pickle Glass (new window)',
+                text: 'Download NexOne',
+                ariaLabel: 'Download NexOne (new window)',
             },
         ],
         []
@@ -498,7 +492,7 @@ const SidebarComponent = ({ isCollapsed, onToggle, onSearchClick }: SidebarProps
                         <Link href="https://pickle.com" target="_blank" rel="noopener noreferrer" className="flex items-center">
                             <Image
                                 src={isCollapsed ? '/symbol.svg' : '/word.svg'}
-                                alt="pickleglass Logo"
+                                alt="NexOne Logo"
                                 width={50}
                                 height={14}
                                 className="mx-3 shrink-0"
@@ -542,8 +536,8 @@ const SidebarComponent = ({ isCollapsed, onToggle, onSearchClick }: SidebarProps
 
                 {!isCollapsed && hasApiKey !== null && (
                     <div className="px-2.5 py-2 text-center">
-                        <span className={`text-xs px-2 py-1 rounded-full ${hasApiKey ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
-                            {hasApiKey ? 'Local running' : 'Pickle Free System'}
+                        <span className={`text-xs px-2 py-1 rounded-full ${hasApiKey ? 'bg-orange-100 text-orange-800' : 'bg-green-100 text-green-800'}`}>
+                            {hasApiKey ? 'Local running' : 'NexOne Free System'}
                         </span>
                     </div>
                 )}

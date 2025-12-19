@@ -28,7 +28,7 @@ export class SttView extends LitElement {
             width: 8px;
         }
         .transcription-container::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.1);
+            background: rgba(60, 25, 0, 0.1);
             border-radius: 4px;
         }
         .transcription-container::-webkit-scrollbar-thumb {
@@ -60,7 +60,7 @@ export class SttView extends LitElement {
         }
 
         .stt-message.me {
-            background: rgba(0, 122, 255, 0.8);
+            background: rgba(255, 107, 0, 0.8);
             color: white;
             align-self: flex-end;
             border-bottom-right-radius: 4px;

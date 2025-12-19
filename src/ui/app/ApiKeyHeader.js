@@ -43,7 +43,7 @@ export class ApiKeyHeader extends LitElement {
             width: 100%;
             height: 100%;
             padding: 24px 16px;
-            background: rgba(0, 0, 0, 0.64);
+            background: rgba(60, 25, 0, 0.64);
             box-shadow: 0px 0px 0px 1.5px rgba(255, 255, 255, 0.64) inset;
             border-radius: 16px;
             flex-direction: column;
@@ -195,7 +195,7 @@ export class ApiKeyHeader extends LitElement {
             transition: background-color 0.2s ease;
         }
         .ollama-action-button.install {
-            background: rgba(0, 122, 255, 0.2);
+            background: rgba(255, 107, 0, 0.2);
         }
         .ollama-action-button.start {
             background: rgba(255, 200, 0, 0.2);
@@ -1803,7 +1803,7 @@ export class ApiKeyHeader extends LitElement {
         return html`
             <div style="margin-top: 3px; display: flex; align-items: center; gap: 6px;">
                 <div style="height: 1px; background: rgba(255,255,255,0.3); border-radius: 0.5px; overflow: hidden; flex: 1;">
-                    <div style="height: 100%; background: rgba(0,122,255,1); width: ${this.installProgress}%; transition: width 0.1s ease;"></div>
+                    <div style="height: 100%; background: rgba(255,107,0,1); width: ${this.installProgress}%; transition: width 0.1s ease;"></div>
                 </div>
                 <div style="font-size: 8px; color: rgba(255,255,255,0.8); font-weight: 600; min-width: 24px; text-align: right;">
                     ${this.installProgress}%
@@ -1851,7 +1851,7 @@ export class ApiKeyHeader extends LitElement {
                       <div style="margin-top: 3px; display: flex; align-items: center; gap: 6px;">
                           <div style="height: 1px; background: rgba(255,255,255,0.3); border-radius: 0.5px; overflow: hidden; flex: 1;">
                               <div
-                                  style="height: 100%; background: rgba(0,122,255,1); width: ${this.installProgress}%; transition: width 0.1s ease;"
+                                  style="height: 100%; background: rgba(255,107,0,1); width: ${this.installProgress}%; transition: width 0.1s ease;"
                               ></div>
                           </div>
                           <div style="font-size: 8px; color: rgba(255,255,255,0.8); font-weight: 600; min-width: 24px; text-align: right;">
@@ -1885,7 +1885,7 @@ export class ApiKeyHeader extends LitElement {
         return html`
             <div style="margin-top: 3px; display: flex; align-items: center; gap: 6px;">
                 <div style="height: 1px; background: rgba(255,255,255,0.3); border-radius: 0.5px; overflow: hidden; flex: 1;">
-                    <div style="height: 100%; background: rgba(0,122,255,1); width: ${state.progress}%; transition: width 0.1s ease;"></div>
+                    <div style="height: 100%; background: rgba(255,107,0,1); width: ${state.progress}%; transition: width 0.1s ease;"></div>
                 </div>
                 <div style="font-size: 8px; color: rgba(255,255,255,0.8); font-weight: 600; min-width: 24px; text-align: right;">
                     ${state.progress}%
@@ -2069,7 +2069,7 @@ export class ApiKeyHeader extends LitElement {
                 <div class="footer">
                     Get your API key from: OpenAI | Google | Anthropic
                     <br />
-                    Glass does not collect your personal data —
+                    NexOne does not collect your personal data —
                     <span class="footer-link" @click=${this.openPrivacyPolicy}>See details</span>
                 </div>
 

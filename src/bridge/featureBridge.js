@@ -12,6 +12,7 @@ const askService = require('../features/ask/askService');
 const listenService = require('../features/listen/listenService');
 const permissionService = require('../features/common/services/permissionService');
 const encryptionService = require('../features/common/services/encryptionService');
+const TaskService = require('../features/task/taskService');
 
 module.exports = {
   // Renderer로부터의 요청을 수신하고 서비스로 전달
@@ -83,7 +84,8 @@ module.exports = {
     ipcMain.handle('ask:sendQuestionFromSummary', async (event, userPrompt) => await askService.sendMessage(userPrompt));
     ipcMain.handle('ask:toggleAskButton', async () => await askService.toggleAskButton());
     ipcMain.handle('ask:closeAskWindow',  async () => await askService.closeAskWindow());
-    
+    ipcMain.handle('ask:showTaskForm', async (event, taskData) => await askService.showTaskForm(taskData));
+
     // Listen
     ipcMain.handle('listen:sendMicAudio', async (event, { data, mimeType }) => await listenService.handleSendMicAudioContent(data, mimeType));
     ipcMain.handle('listen:sendSystemAudio', async (event, { data, mimeType }) => {
@@ -106,6 +108,52 @@ module.exports = {
         console.error('[FeatureBridge] listen:changeSession failed', error.message);
         return { success: false, error: error.message };
       }
+    });
+
+    // Task
+    const taskService = new TaskService();
+
+    ipcMain.handle('task:show', async (event, taskData) => {
+      const { handleWindowVisibilityRequest, windowPool } = require('../window/windowManager');
+      taskService.setTask(taskData);
+      await handleWindowVisibilityRequest('task', true);
+      return { success: true };
+    });
+
+    ipcMain.handle('task:hide', async () => {
+      const { handleWindowVisibilityRequest } = require('../window/windowManager');
+      taskService.clearTask();
+      await handleWindowVisibilityRequest('task', false);
+      return { success: true };
+    });
+
+    ipcMain.handle('task:cancel', async () => {
+      const { handleWindowVisibilityRequest } = require('../window/windowManager');
+      taskService.cancelTask();
+      await handleWindowVisibilityRequest('task', false);
+      return { success: true };
+    });
+
+    ipcMain.handle('task:confirm', async (event, taskData) => {
+      const { handleWindowVisibilityRequest } = require('../window/windowManager');
+      taskService.confirmTask(taskData);
+      await handleWindowVisibilityRequest('task', false);
+      return { success: true };
+    });
+
+    ipcMain.handle('task:updateFields', async (event, fields) => {
+      taskService.updateFields(fields);
+      return { success: true };
+    });
+
+    ipcMain.handle('task:adjustWindowHeight', async (event, height) => {
+      const { windowPool } = require('../window/windowManager');
+      const taskWindow = windowPool?.get('task');
+      if (taskWindow && !taskWindow.isDestroyed()) {
+        const bounds = taskWindow.getBounds();
+        taskWindow.setBounds({ ...bounds, height: Math.round(height) });
+      }
+      return { success: true };
     });
 
     // ModelStateService

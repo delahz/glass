@@ -167,7 +167,11 @@ contextBridge.exposeInMainWorld('api', {
     onScrollResponseUp: (callback) => ipcRenderer.on('aks:scrollResponseUp', callback),
     removeOnScrollResponseUp: (callback) => ipcRenderer.removeListener('aks:scrollResponseUp', callback),
     onScrollResponseDown: (callback) => ipcRenderer.on('aks:scrollResponseDown', callback),
-    removeOnScrollResponseDown: (callback) => ipcRenderer.removeListener('aks:scrollResponseDown', callback)
+    removeOnScrollResponseDown: (callback) => ipcRenderer.removeListener('aks:scrollResponseDown', callback),
+
+    // Task Form
+    onShowTaskForm: (callback) => ipcRenderer.on('ask:showTaskForm', callback),
+    removeOnShowTaskForm: (callback) => ipcRenderer.removeListener('ask:showTaskForm', callback)
   },
 
   // src/ui/listen/ListenView.js
@@ -191,11 +195,28 @@ contextBridge.exposeInMainWorld('api', {
   summaryView: {
     // Message Handling
     sendQuestionFromSummary: (text) => ipcRenderer.invoke('ask:sendQuestionFromSummary', text),
-    
+    showTaskForm: (taskData) => ipcRenderer.invoke('ask:showTaskForm', taskData),
+    showTaskWindow: (taskData) => ipcRenderer.invoke('task:show', taskData),
+
     // Listeners
     onSummaryUpdate: (callback) => ipcRenderer.on('summary-update', callback),
     removeOnSummaryUpdate: (callback) => ipcRenderer.removeListener('summary-update', callback),
     removeAllSummaryUpdateListeners: () => ipcRenderer.removeAllListeners('summary-update')
+  },
+
+  // src/ui/task/TaskView.js
+  taskView: {
+    // Actions
+    cancel: () => ipcRenderer.invoke('task:cancel'),
+    confirm: (taskData) => ipcRenderer.invoke('task:confirm', taskData),
+    updateFields: (fields) => ipcRenderer.invoke('task:updateFields', fields),
+    adjustWindowHeight: (height) => ipcRenderer.invoke('task:adjustWindowHeight', height),
+
+    // Listeners
+    onTaskData: (callback) => ipcRenderer.on('task:data', callback),
+    removeOnTaskData: (callback) => ipcRenderer.removeListener('task:data', callback),
+    onClear: (callback) => ipcRenderer.on('task:clear', callback),
+    removeOnClear: (callback) => ipcRenderer.removeListener('task:clear', callback),
   },
 
   // src/ui/settings/SettingsView.js

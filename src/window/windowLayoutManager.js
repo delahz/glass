@@ -145,28 +145,31 @@ class WindowLayoutManager {
         } else {
             display = getCurrentDisplay(header);
         }
-    
+
         const { width: screenWidth, height: screenHeight, x: workAreaX, y: workAreaY } = display.workArea;
-    
+
         const ask = this.windowPool.get('ask');
         const listen = this.windowPool.get('listen');
-    
+        const task = this.windowPool.get('task');
+
         const askVis = visibility.ask && ask && !ask.isDestroyed();
         const listenVis = visibility.listen && listen && !listen.isDestroyed();
-    
-        if (!askVis && !listenVis) return {};
-    
+        const taskVis = visibility.task && task && !task.isDestroyed();
+
+        if (!askVis && !listenVis && !taskVis) return {};
+
         const PAD = 8;
         const headerTopRel = headerBounds.y - workAreaY;
         const headerBottomRel = headerTopRel + headerBounds.height;
         const headerCenterXRel = headerBounds.x - workAreaX + headerBounds.width / 2;
-        
+
         const relativeX = headerCenterXRel / screenWidth;
         const relativeY = (headerBounds.y - workAreaY) / screenHeight;
         const strategy = this.determineLayoutStrategy(headerBounds, screenWidth, screenHeight, relativeX, relativeY, workAreaX, workAreaY);
-    
+
         const askB = askVis ? ask.getBounds() : null;
         const listenB = listenVis ? listen.getBounds() : null;
+        const taskB = taskVis ? task.getBounds() : null;
 
         if (askVis) {
             console.log(`[Layout Debug] Ask Window Bounds: height=${askB.height}, width=${askB.width}`);
@@ -174,13 +177,69 @@ class WindowLayoutManager {
         if (listenVis) {
             console.log(`[Layout Debug] Listen Window Bounds: height=${listenB.height}, width=${listenB.width}`);
         }
-    
+        if (taskVis) {
+            console.log(`[Layout Debug] Task Window Bounds: height=${taskB.height}, width=${taskB.width}`);
+        }
+
         const layout = {};
-    
-        if (askVis && listenVis) {
+
+        // 3-column layout: Listen | Task | Ask
+        if (listenVis && taskVis && askVis) {
+            const totalWidth = listenB.width + taskB.width + askB.width + PAD * 2;
+            let listenXRel = headerCenterXRel - (totalWidth / 2);
+
+            // Ensure we stay within screen bounds
+            if (listenXRel < PAD) {
+                listenXRel = PAD;
+            }
+            if (listenXRel + totalWidth > screenWidth - PAD) {
+                listenXRel = screenWidth - PAD - totalWidth;
+            }
+
+            const taskXRel = listenXRel + listenB.width + PAD;
+            const askXRel = taskXRel + taskB.width + PAD;
+
+            if (strategy.primary === 'above') {
+                const windowBottomAbs = headerBounds.y - PAD;
+                layout.listen = { x: Math.round(listenXRel + workAreaX), y: Math.round(windowBottomAbs - listenB.height), width: listenB.width, height: listenB.height };
+                layout.task = { x: Math.round(taskXRel + workAreaX), y: Math.round(windowBottomAbs - taskB.height), width: taskB.width, height: taskB.height };
+                layout.ask = { x: Math.round(askXRel + workAreaX), y: Math.round(windowBottomAbs - askB.height), width: askB.width, height: askB.height };
+            } else { // 'below'
+                const yAbs = headerBounds.y + headerBounds.height + PAD;
+                layout.listen = { x: Math.round(listenXRel + workAreaX), y: Math.round(yAbs), width: listenB.width, height: listenB.height };
+                layout.task = { x: Math.round(taskXRel + workAreaX), y: Math.round(yAbs), width: taskB.width, height: taskB.height };
+                layout.ask = { x: Math.round(askXRel + workAreaX), y: Math.round(yAbs), width: askB.width, height: askB.height };
+            }
+        }
+        // 2-column layout with task: Listen | Task (no Ask)
+        else if (listenVis && taskVis) {
+            const totalWidth = listenB.width + taskB.width + PAD;
+            let listenXRel = headerCenterXRel - (totalWidth / 2);
+
+            if (listenXRel < PAD) {
+                listenXRel = PAD;
+            }
+            if (listenXRel + totalWidth > screenWidth - PAD) {
+                listenXRel = screenWidth - PAD - totalWidth;
+            }
+
+            const taskXRel = listenXRel + listenB.width + PAD;
+
+            if (strategy.primary === 'above') {
+                const windowBottomAbs = headerBounds.y - PAD;
+                layout.listen = { x: Math.round(listenXRel + workAreaX), y: Math.round(windowBottomAbs - listenB.height), width: listenB.width, height: listenB.height };
+                layout.task = { x: Math.round(taskXRel + workAreaX), y: Math.round(windowBottomAbs - taskB.height), width: taskB.width, height: taskB.height };
+            } else {
+                const yAbs = headerBounds.y + headerBounds.height + PAD;
+                layout.listen = { x: Math.round(listenXRel + workAreaX), y: Math.round(yAbs), width: listenB.width, height: listenB.height };
+                layout.task = { x: Math.round(taskXRel + workAreaX), y: Math.round(yAbs), width: taskB.width, height: taskB.height };
+            }
+        }
+        // Original 2-column layout: Listen | Ask
+        else if (askVis && listenVis) {
             let askXRel = headerCenterXRel - (askB.width / 2);
             let listenXRel = askXRel - listenB.width - PAD;
-    
+
             if (listenXRel < PAD) {
                 listenXRel = PAD;
                 askXRel = listenXRel + listenB.width + PAD;
@@ -189,7 +248,7 @@ class WindowLayoutManager {
                 askXRel = screenWidth - PAD - askB.width;
                 listenXRel = askXRel - listenB.width - PAD;
             }
-            
+
             if (strategy.primary === 'above') {
                 const windowBottomAbs = headerBounds.y - PAD;
                 layout.ask = { x: Math.round(askXRel + workAreaX), y: Math.round(windowBottomAbs - askB.height), width: askB.width, height: askB.height };
@@ -200,20 +259,20 @@ class WindowLayoutManager {
                 layout.listen = { x: Math.round(listenXRel + workAreaX), y: Math.round(yAbs), width: listenB.width, height: listenB.height };
             }
         } else { // Single window
-            const winName = askVis ? 'ask' : 'listen';
-            const winB = askVis ? askB : listenB;
+            const winName = askVis ? 'ask' : (listenVis ? 'listen' : 'task');
+            const winB = askVis ? askB : (listenVis ? listenB : taskB);
             if (!winB) return {};
-    
+
             let xRel = headerCenterXRel - winB.width / 2;
             xRel = Math.max(PAD, Math.min(screenWidth - winB.width - PAD, xRel));
-    
+
             let yPos;
             if (strategy.primary === 'above') {
                 yPos = (headerBounds.y - workAreaY) - PAD - winB.height;
             } else { // 'below'
                 yPos = (headerBounds.y - workAreaY) + headerBounds.height + PAD;
             }
-            
+
             layout[winName] = { x: Math.round(xRel + workAreaX), y: Math.round(yPos + workAreaY), width: winB.width, height: winB.height };
         }
         return layout;

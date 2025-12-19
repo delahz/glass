@@ -30,7 +30,7 @@ export class PermissionHeader extends LitElement {
             width: 285px;
             /* height is now set dynamically */
             padding: 18px 20px;
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(60, 25, 0, 0.3);
             border-radius: 16px;
             overflow: hidden;
             position: relative;
@@ -570,11 +570,11 @@ export class PermissionHeader extends LitElement {
                             </div>
                         ` : ''}
                     ` : html`
-                        <button 
-                            class="continue-button" 
+                        <button
+                            class="continue-button"
                             @click=${this.handleContinue}
                         >
-                            Continue to Pickle Glass
+                            Continue to NexOne
                         </button>
                     `}
                 </div>

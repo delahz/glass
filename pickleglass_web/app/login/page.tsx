@@ -88,10 +88,10 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Welcome to Pickle Glass</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Welcome to NexOne</h1>
         <p className="text-gray-600 mt-2">Sign in with your Google account to sync your data across all devices.</p>
         {isElectronMode ? (
-          <p className="text-sm text-blue-600 mt-1 font-medium">🔗 Login requested from Electron app</p>
+          <p className="text-sm text-orange-600 mt-1 font-medium">🔗 Login requested from Electron app</p>
         ) : (
           <p className="text-sm text-gray-500 mt-1">Local mode will run if you don't sign in.</p>
         )}
@@ -102,7 +102,7 @@ export default function LoginPage() {
           <button
             onClick={handleGoogleSignIn}
             disabled={isLoading}
-            className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Chrome className="h-5 w-5" />
             <span>{isLoading ? 'Signing in...' : 'Sign in with Google'}</span>
